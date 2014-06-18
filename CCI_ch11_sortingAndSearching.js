@@ -95,12 +95,16 @@ var executeHelper = function () {
 /*
   - input has to be sorted (merge sort)
   - find midIndex
-  - check midIndex
+  - check array value at midIndex
   - if smaller -> run bin search on smaller portion of array
+    + startIndex remains the same
+    + endIndex is midpoint-1
   - if larger -> run bin search on larger partition of array
+    + startIndex to midpoint+1
+    + endIndex remains the same
   * using slice would negate the benefits of binary search
   * need to keep track of beginning and endIndex of partition // inclusive
-  * two pointers
+	  + two pointers 
 
   [0]                 // mid: 
   [0, 1]              // 
@@ -121,7 +125,6 @@ var binarySearch = function (array, target, beginIndex, endIndex, cycles) {
 
   // addition and math.floor gets the midpoint
 	var midIndex = Math.floor((endIndex + beginIndex)/2); 
-
 
 	// base case, if we're on the same index
 	// terminate if we found the target
@@ -151,12 +154,133 @@ executeBinarySearch = function () {
 	for (var i = -2; i <= 12; i++) {
 		binarySearch.apply(null, [range0, i]);
 	}
-
-  // var range1 = createRange(0,100);
-  // var r01 = binarySearch(range1, 99);
-
-
 };
 
-executeBinarySearch();
+// executeBinarySearch();
 
+/// Merge sort
+/*
+  two parts to merge sort, the SPLIT, and the MERGE
+
+  SPLIT
+  - takes in an array of elements
+    + option for ascending or descending? or function for comparison?
+  - will partition this array in two parts and sort each half
+  - each half will run the same logic, split/sort until down to an array of single / two elements
+    + creating a new array? no...that would make it n^2? or 2n? both bad. we need logarithmic
+
+  MERGE
+  - NO swapping in place, have to create a new array...
+    + swapping in place is the SAME as other types of sort,
+     e.g.: image case: [7, 1, 5, 6], eventually have to compare 7 to 6
+  - iterate through leftPart and rightPart, not through for loops...otherwise would be for-within-for
+    + recursive?
+    + branching?
+  - if nothing remains on one side, then take the rest of the otherside, and push to array / concat with array
+
+  PARAMS:
+  - takes array
+  - going to have an inner function?
+
+*/
+
+var merge = function (array, leftArray, rightArray) {
+	var leftCount = 0;
+	var rightCount = 0;
+
+	for (var i = 0; i < array.length; i++) {
+		leftElement = leftArray[leftCount];
+		rightElement = rightArray[rightCount];
+
+    // check if right and left elements are defined, that means we've taken all of them, and we can append the other side to the array
+		if (leftElement === undefined) {
+			array[i] = rightElement;
+			rightElement++;
+    // if right element is defined, if not, add all left
+		} else if (rightElement === undefined) {
+			array[i] = leftElement;
+			leftElement++;
+    // take the left
+		} else if (leftElement <= rightElement) {
+			array[i] = leftElement;
+			leftCount++;
+
+    // take the right
+		} else {
+			array[i] = rightElement;
+			rightCount++;
+		}
+	}
+
+	return array;
+};
+
+var mergeSort = function (array) {
+
+	// default corner cases, if only one element, then return the element, it is sorted
+	if (array.length <= 1) { return array; }
+
+	// base, terminal
+	var midIndex = Math.floor(array.length/2);
+
+	// logic. Left and right
+	var leftArray = mergeSort(array.slice(0, midIndex));
+	var rightArray = mergeSort(array.slice(midIndex));
+
+	// merge left and right
+	return merge(array, leftArray, rightArray);
+};
+
+var executeMergeSort = function () {
+	var results = {};
+	var count = 0;
+
+	var test0 = [];
+	var r00 = mergeSort(test0).length === 0;
+  console.log('checked test:', count)
+  count++;
+
+	var test1 = [5];
+	var r01 = mergeSort(test1)[0] === 5;
+  console.log('checked test:', count)
+  count++;
+
+	var test2 = [-4];
+	var r02 = mergeSort(test2)[0] === -4;
+  console.log('checked test:', count)
+  count++;
+
+	var test3 = [-3, 4];
+	var r03 = mergeSort(test3)[0] === -3;
+	var r04 = mergeSort(test3)[1] === 4;
+  console.log('checked test:', count)
+  count++;
+
+	var test4 = [3, 1];
+	var r05 = mergeSort(test4)[0] === 1;
+	var r06 = mergeSort(test4)[1] === 3;
+  console.log('checked test:', count)
+  count++;
+
+	var test5 = [4, 1, 2, 3];
+	var r07 = mergeSort(test5);
+  console.log('checked test:', count)
+  count++;
+
+ 	var test6 = [3, 2, 4, 0, 7, 1, 5, 6];
+	var r08 = mergeSort(test6);
+  console.log('checked test:', count)
+  count++;
+
+	var test7 = createRange(-4, 13, 1, true);
+	var r09 = mergeSort(test7);
+  console.log('checked test:', count)
+  count++;
+
+	console.log(r00, r01, r02, r03, r04, r05, r06); 
+	console.log(r07);
+	console.log(r08);
+	console.log(r09);
+};
+
+executeMergeSort();
