@@ -119,8 +119,9 @@ var binarySearch = function (array, target, beginIndex, endIndex, cycles) {
 	if (array.length === 0 || target < array[0] || target > array[array.length-1]) { return false; }
 
 	// default values
-	beginIndex = beginIndex || 0;
-	endIndex = endIndex || array.length-1; // instead of length, we calculate based on index position
+	// TRICK!!! if we use OR operator, 0 counts as falsy, even though sometimes we DO want the 0th index
+	beginIndex = beginIndex !== undefined ? beginIndex : 0;
+	endIndex = endIndex !== undefined ? endIndex : array.length-1; // instead of length, we calculate based on index position
 	cycles = cycles || 0;
 
   // addition and math.floor gets the midpoint
@@ -149,9 +150,20 @@ var binarySearch = function (array, target, beginIndex, endIndex, cycles) {
 
 };
 
+/*
+
+Works:
+  range -10 1000
+  i       0 1000
+
+
+
+*/
+
 executeBinarySearch = function () {
-	var range0 = createRange(0, 10);
-	for (var i = -2; i <= 12; i++) {
+	var range0 = createRange(-30, 30);
+	console.log('range: ', range0);
+	for (var i = -30; i <= 30; i++) {
 		binarySearch.apply(null, [range0, i]);
 	}
 };
@@ -221,14 +233,10 @@ var mergeSort = function (array) {
 	if (array.length <= 1) { return array; }
 
 	// base, terminal
-	var midIndex = Math.floor(array.length/2);
-
-	// logic. Left and right
-	var leftArray = mergeSort(array.slice(0, midIndex));
-	var rightArray = mergeSort(array.slice(midIndex));
+	var midIndex = Math.floor((array.length-1)/2);
 
 	// merge left and right
-	return merge(array, leftArray, rightArray);
+	return merge(array, mergeSort(array.slice(0, midIndex)), mergeSort(array.slice(midIndex)));
 };
 
 var executeMergeSort = function () {
@@ -262,7 +270,7 @@ var executeMergeSort = function () {
   console.log('checked test:', count)
   count++;
 
-	var test5 = [4, 1, 2, 3];
+	var test5 = [1, 2, 4];
 	var r07 = mergeSort(test5);
   console.log('checked test:', count)
   count++;
